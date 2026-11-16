@@ -9,17 +9,12 @@ import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
 import { ShoppingBag, X } from "lucide-react"
 
+import { CartDrawer, useCartCount } from "@/components/cart-drawer"
 import { NavLink } from "@/components/nav-link"
 import { Roll } from "@/components/roll"
 import { lockScroll, scrollToTarget } from "@/components/smooth-scroll"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet"
 import { prefersReducedMotion, whenReady } from "@/lib/intro"
+import { cart } from "@/lib/cart"
 import { photos } from "@/lib/menu"
 import { site } from "@/lib/site"
 import { cn } from "@/lib/utils"
@@ -45,7 +40,7 @@ export function SiteHeader() {
   const [stuck, setStuck] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [cartOpen, setCartOpen] = useState(false)
+  const count = useCartCount()
   const [peek, setPeek] = useState(0)
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -241,14 +236,20 @@ export function SiteHeader() {
         <div className="flex items-center gap-2.5">
           <button
             type="button"
-            onClick={() => setCartOpen(true)}
-            aria-label="Open your box (0 items)"
+            onClick={() => cart.setOpen(true)}
+            aria-label={`Open your box (${count} ${count === 1 ? "item" : "items"})`}
             className="hd-in group relative grid size-12 place-items-center rounded-full bg-milk text-cocoa ring-1 ring-cocoa/10 transition-colors duration-300 hover:bg-cocoa hover:text-milk"
           >
             <ShoppingBag className="size-5 group-hover:animate-wiggle" />
-            <span className="absolute -top-0.5 -right-0.5 grid size-5 place-items-center rounded-full bg-clay text-[11px] font-bold text-milk">
-              0
-            </span>
+            <motion.span
+              key={count}
+              initial={{ scale: count ? 1.6 : 1 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", bounce: 0.5, duration: 0.45 }}
+              className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-clay px-1 text-[11px] font-bold text-milk"
+            >
+              {count}
+            </motion.span>
           </button>
 
           <NavLink
@@ -288,6 +289,25 @@ export function SiteHeader() {
               )}
             >
               <Bars />
+            </button>
+
+            {/* same for the box, so it's reachable while scrolling */}
+            <button
+              type="button"
+              onClick={() => cart.setOpen(true)}
+              aria-label={`Open your box (${count} ${count === 1 ? "item" : "items"})`}
+              tabIndex={floating ? 0 : -1}
+              className={cn(
+                "group fixed top-4 right-[5.25rem] z-[60] grid size-14 place-items-center rounded-full bg-milk text-cocoa shadow-[0_12px_30px_-10px_rgba(59,30,26,0.6)] ring-1 ring-cocoa/10 transition-[transform,opacity,background-color,color] duration-500 ease-studio hover:bg-cocoa hover:text-milk md:right-[6.75rem]",
+                floating
+                  ? "scale-100 opacity-100"
+                  : "pointer-events-none scale-0 opacity-0"
+              )}
+            >
+              <ShoppingBag className="size-5 group-hover:animate-wiggle" />
+              <span className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-clay px-1 text-[11px] font-bold text-milk">
+                {count}
+              </span>
             </button>
 
             <div
@@ -397,53 +417,7 @@ export function SiteHeader() {
           document.body
         )}
 
-      {/* cart: empty state only for now */}
-      <Sheet open={cartOpen} onOpenChange={setCartOpen}>
-        <SheetContent side="right" className="bg-milk">
-          <SheetHeader className="p-6 pb-0">
-            <SheetTitle className="text-2xl font-extrabold">
-              Your box
-            </SheetTitle>
-            <SheetDescription>Nothing in here yet.</SheetDescription>
-          </SheetHeader>
-          <div className="flex flex-1 flex-col items-center justify-center gap-6 px-6 pb-16 text-center">
-            <div className="relative h-44 w-52">
-              {photos.slice(0, 3).map((p, k) => (
-                <span
-                  key={p.id}
-                  className="absolute top-0 size-32 overflow-hidden rounded-md border-4 border-white shadow-lg"
-                  style={{
-                    left: `${k * 32}px`,
-                    top: `${k % 2 ? 24 : 0}px`,
-                    rotate: `${(k - 1) * 9}deg`,
-                  }}
-                >
-                  <Image
-                    src={p.image}
-                    alt=""
-                    fill
-                    sizes="128px"
-                    className="object-cover"
-                  />
-                </span>
-              ))}
-            </div>
-            <p className="max-w-[24ch] text-lg text-cocoa/70">
-              Pick a dozen from the menu and it will land here.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setCartOpen(false)
-                window.setTimeout(() => router.push("/menu"), 380)
-              }}
-              className="h-12 rounded-full bg-clay px-7 font-semibold text-milk transition-colors hover:bg-cocoa"
-            >
-              See the flavors
-            </button>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <CartDrawer />
     </header>
   )
 }

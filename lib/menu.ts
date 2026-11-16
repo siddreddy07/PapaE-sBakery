@@ -229,3 +229,35 @@ export function getSpecial(id: string): Special {
 export const photos = allSpecials.filter(
   (x): x is Special & { image: string } => !!x.image
 )
+
+/** What the cart needs to know about any orderable item (cakepop flavor or special). */
+export type Orderable = {
+  id: string
+  name: string
+  detail: string
+  /** undefined = "DM for price" */
+  price?: number
+  flavor?: Flavor
+  image?: string
+}
+
+export function findOrderable(id: string): Orderable | undefined {
+  const f = cakepops.items.find((x) => x.id === id)
+  if (f)
+    return {
+      id: f.id,
+      name: f.name,
+      detail: `1 ${cakepops.unit} cakepops`,
+      price: cakepops.price,
+      flavor: f,
+    }
+  const s = allSpecials.find((x) => x.id === id)
+  if (s)
+    return {
+      id: s.id,
+      name: s.name,
+      detail: s.detail,
+      price: s.price,
+      image: s.image,
+    }
+}

@@ -13,8 +13,9 @@ import {
   useMotionValue,
   useSpring,
 } from "motion/react"
-import { ArrowUpRight, Camera, Plus } from "lucide-react"
+import { ArrowUpRight, Camera } from "lucide-react"
 
+import { AddButton } from "@/components/add-button"
 import { Cakepop } from "@/components/cakepop"
 import { scrollToTarget } from "@/components/smooth-scroll"
 import { prefersReducedMotion } from "@/lib/intro"
@@ -165,13 +166,12 @@ export function RowsView({ cat, full }: { cat: RowCategory; full?: boolean }) {
                   flavor={f}
                   className="h-11 w-auto rotate-[18deg] transition-transform duration-500 ease-studio group-hover:scale-110 group-hover:-rotate-6 md:h-16 [@media(hover:hover)_and_(pointer:fine)]:hidden"
                 />
-                <button
-                  type="button"
-                  aria-label={`Add ${f.name} to your box`}
-                  className="grid size-9 shrink-0 place-items-center rounded-full border border-current transition-transform duration-500 ease-studio group-hover:rotate-90 hover:scale-110 md:size-14"
-                >
-                  <Plus className="size-5 md:size-6" />
-                </button>
+                <AddButton
+                  id={f.id}
+                  name={f.name}
+                  className="grid size-9 shrink-0 place-items-center rounded-full border border-current md:size-14"
+                  iconClassName="size-5 md:size-6"
+                />
               </div>
             </div>
             <span
@@ -331,13 +331,12 @@ export function CardsView({
                       {s.detail}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    aria-label={`Add ${s.name} to your box`}
-                    className="hidden size-12 shrink-0 place-items-center rounded-full bg-clay text-milk transition-[transform,background-color] duration-500 ease-studio group-hover:rotate-90 hover:scale-110 hover:bg-cocoa sm:grid"
-                  >
-                    <Plus className="size-5" />
-                  </button>
+                  <AddButton
+                    id={s.id}
+                    name={s.name}
+                    className="grid size-9 shrink-0 place-items-center rounded-full bg-clay text-milk transition-colors duration-300 hover:bg-cocoa sm:size-12"
+                    iconClassName="size-5"
+                  />
                 </div>
               </article>
             </motion.li>
