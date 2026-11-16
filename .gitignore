@@ -37,3 +37,11 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# not for the repo
+/CLAUDE.md
+/AGENTS.md
+/.claude/
+/PLAN.md
+/resources/
+.mcp.json
